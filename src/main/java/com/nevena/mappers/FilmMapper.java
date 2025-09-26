@@ -1,18 +1,40 @@
 package com.nevena.mappers;
+
+import com.nevena.dto.film.FilmCreateDto;
+import com.nevena.dto.film.FilmResponseDto;
+import com.nevena.dto.film.FilmUpdateDto;
 import com.nevena.entities.Film;
-import com.nevena.dto.FilmDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import com.nevena.mappers.config.CentralMapperConfig;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = CentralMapperConfig.class, uses = {IdResolvers.class})
 public interface FilmMapper {
+    default com.nevena.entities.Genre map(java.lang.Long id) {
+        if (id == null) return null;
+        com.nevena.entities.Genre g = new com.nevena.entities.Genre();
+        g.setGenreId(id);
+        return g;
+    }
+    // Create: genreId -> genre
+    @Mapping(target = "filmId", ignore = true)
+    @Mapping(target = "genre", source = "genreId")
+    Film toEntity(FilmCreateDto dto);
 
-    FilmMapper INSTANCE = Mappers.getMapper(FilmMapper.class);
+    // Partial update: only provided fields; genreId -> genre
+    @BeanMapping(
+            ignoreByDefault = true,
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+    )
+    @Mapping(target = "filmId", source = "filmId")
+    @Mapping(target = "title", source = "title")
+    @Mapping(target = "duration", source = "duration")
+    @Mapping(target = "posterUrl", source = "posterUrl")
+    @Mapping(target = "active", source = "active")
+    @Mapping(target = "genre", source = "genreId")
+    void update(@MappingTarget Film entity, FilmUpdateDto dto);
 
-    @Mapping(source = "genre.name", target = "genreName")
-    FilmDto toDTO(Film film);
-
-    @Mapping(source = "genreName", target = "genre.name")
-    Film toEntity(FilmDto dto);
+    // Response: flatten genre
+    @Mapping(target = "genreId", source = "genre.genreId")
+    @Mapping(target = "genreName", source = "genre.name")
+    FilmResponseDto toDto(Film entity);
 }

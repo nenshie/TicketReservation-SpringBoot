@@ -1,63 +1,57 @@
-package com.nevena.services.impl;
+package com.nevena.service.impl;
 
-import com.nevena.dto.ProjectionDto;
+import com.nevena.dto.projection.ProjectionCreateDto;
+import com.nevena.dto.projection.ProjectionResponseDto;
+import com.nevena.dto.projection.ProjectionUpdateDto;
 import com.nevena.entities.Projection;
-import com.nevena.mappers.FilmMapper;
 import com.nevena.mappers.ProjectionMapper;
-import com.nevena.mappers.RoomMapper;
 import com.nevena.repository.ProjectionRepository;
 import com.nevena.service.ProjectionService;
+import com.nevena.service.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectionServiceImpl implements ProjectionService {
 
-    private final ProjectionRepository projectionRepository;
-    private final ProjectionMapper projectionMapper = ProjectionMapper.INSTANCE;
-    private final FilmMapper filmMapper = FilmMapper.INSTANCE;
-    private final RoomMapper roomMapper = RoomMapper.INSTANCE;
+    private final ProjectionRepository repo;
+    private final ProjectionMapper mapper;
 
-    public ProjectionServiceImpl(ProjectionRepository projectionRepository) {
-        this.projectionRepository = projectionRepository;
+    @Override
+    @Transactional
+    public ProjectionResponseDto create(ProjectionCreateDto dto) {
+        Projection entity = mapper.toEntity(dto);
+        return mapper.toDto(repo.save(entity));
     }
 
     @Override
-    public List<ProjectionDto> getAllProjections() {
-        return projectionRepository.findAll()
-                .stream()
-                .map(projectionMapper::toDto)
-                .collect(Collectors.toList());
+    @Transactional
+    public ProjectionResponseDto update(ProjectionUpdateDto dto) {
+        Projection entity = repo.findById(dto.getProjectionId())
+                .orElseThrow(() -> new NotFoundException("Projection not found"));
+        mapper.update(entity, dto);
+        return mapper.toDto(repo.save(entity));
     }
 
     @Override
-    public ProjectionDto getProjectionById(Long id) {
-        return projectionRepository.findById(id)
-                .map(projectionMapper::toDto)
-                .orElse(null);
+    public ProjectionResponseDto get(Long id) {
+        return repo.findById(id)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new NotFoundException("Projection not found"));
     }
 
     @Override
-    public ProjectionDto createProjection(ProjectionDto projectionDto) {
-        Projection projection = projectionMapper.toEntity(projectionDto);
-        return projectionMapper.toDto(projectionRepository.save(projection));
+    @Transactional
+    public void delete(Long id) {
+        repo.deleteById(id);
     }
 
     @Override
-    public ProjectionDto updateProjection(Long id, ProjectionDto projectionDto) {
-        return projectionRepository.findById(id)
-                .map(existing -> {
-                    existing.setFilm(filmMapper.toEntity(projectionDto.getFilm()));
-                    existing.setRoom(roomMapper.toEntity(projectionDto.getRoom()));
-                    existing.setDateTime(projectionDto.getDateTime());
-                    return projectionMapper.toDto(projectionRepository.save(existing));
-                }).orElse(null);
-    }
-
-    @Override
-    public void deleteProjection(Long id) {
-        projectionRepository.deleteById(id);
+    public Page<ProjectionResponseDto> list(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toDto);
     }
 }

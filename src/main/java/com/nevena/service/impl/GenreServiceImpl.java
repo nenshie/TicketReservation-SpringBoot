@@ -1,58 +1,28 @@
 package com.nevena.service.impl;
 
-import com.nevena.dto.GenreDto;
-import com.nevena.entities.Genre;
+import com.nevena.dto.genre.GenreResponseDto;
+import com.nevena.mappers.GenreMapper;
 import com.nevena.repository.GenreRepository;
 import com.nevena.service.GenreService;
-import com.nevena.mappers.GenreMapper;
+import com.nevena.service.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Service
+@Service @RequiredArgsConstructor
 public class GenreServiceImpl implements GenreService {
+    private final GenreRepository repo;
+    private final GenreMapper mapper;
 
-    private final GenreRepository genreRepository;
-    private final GenreMapper genreMapper;
-
-    public GenreServiceImpl(GenreRepository genreRepository, GenreMapper genreMapper) {
-        this.genreRepository = genreRepository;
-        this.genreMapper = genreMapper;
+    @Override
+    public GenreResponseDto get(Long id) {
+        return repo.findById(id).map(mapper::toDto)
+                .orElseThrow(() -> new NotFoundException("Genre not found"));
     }
 
     @Override
-    public List<GenreDto> getAllGenres() {
-        return genreRepository.findAll().stream()
-                .map(genreMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public GenreDto getGenreById(Long id) {
-        return genreRepository.findById(id)
-                .map(genreMapper::toDto)
-                .orElse(null);
-    }
-
-    @Override
-    public GenreDto createGenre(GenreDto genreDto) {
-        Genre genre = genreMapper.toEntity(genreDto);
-        return genreMapper.toDto(genreRepository.save(genre));
-    }
-
-    @Override
-    public GenreDto updateGenre(Long id, GenreDto genreDto) {
-        return genreRepository.findById(id)
-                .map(existing -> {
-                    existing.setName(genreDto.getName());
-                    return genreMapper.toDto(genreRepository.save(existing));
-                })
-                .orElse(null);
-    }
-
-    @Override
-    public void deleteGenre(Long id) {
-        genreRepository.deleteById(id);
+    public Page<GenreResponseDto> list(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toDto);
     }
 }

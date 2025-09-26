@@ -1,13 +1,13 @@
 package com.nevena.service;
 
-import com.nevena.entities.Ticket;
-
-import java.util.List;
+import com.nevena.dto.ticket.TicketCreateDto;
+import com.nevena.dto.ticket.TicketResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TicketService {
-
-    List<Ticket> getAllTickets();
-    Ticket getTicketById(Long id);
-    Ticket saveTicket(Ticket ticket);
-    void deleteTicket(Long id);
+    TicketResponseDto create(TicketCreateDto dto);
+    TicketResponseDto get(Long id);
+    TicketResponseDto getByPublicCode(String publicCode);
+    Page<TicketResponseDto> list(Pageable pageable);
 }

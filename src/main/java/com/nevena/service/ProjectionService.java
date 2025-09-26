@@ -1,14 +1,15 @@
 package com.nevena.service;
 
-import com.nevena.dto.ProjectionDto;
-
-import java.util.List;
+import com.nevena.dto.projection.ProjectionCreateDto;
+import com.nevena.dto.projection.ProjectionResponseDto;
+import com.nevena.dto.projection.ProjectionUpdateDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProjectionService {
-
-    List<ProjectionDto> getAllProjections();
-    ProjectionDto getProjectionById(Long id);
-    ProjectionDto createProjection(ProjectionDto projectionDto);
-    ProjectionDto updateProjection(Long id, ProjectionDto projectionDto);
-    void deleteProjection(Long id);
+    ProjectionResponseDto create(ProjectionCreateDto dto);
+    ProjectionResponseDto update(ProjectionUpdateDto dto);
+    ProjectionResponseDto get(Long id);
+    void delete(Long id);
+    Page<ProjectionResponseDto> list(Pageable pageable);
 }

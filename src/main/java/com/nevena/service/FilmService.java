@@ -1,14 +1,15 @@
 package com.nevena.service;
 
-import com.nevena.dto.FilmDto;
-
-import java.util.List;
+import com.nevena.dto.film.FilmCreateDto;
+import com.nevena.dto.film.FilmResponseDto;
+import com.nevena.dto.film.FilmUpdateDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface FilmService {
-
-    List<FilmDto> getAllFilms();
-    FilmDto getFilmById(Long id);
-    FilmDto createFilm(FilmDto film);
-    FilmDto updateFilm(Long id, FilmDto filmDTO);
-    void deleteFilm(Long id);
+    FilmResponseDto create(FilmCreateDto dto);
+    FilmResponseDto update(FilmUpdateDto dto);
+    FilmResponseDto get(Long id);
+    void delete(Long id);
+    Page<FilmResponseDto> list(Pageable pageable, String filterBy, String filterValue);
 }

@@ -1,15 +1,12 @@
 package com.nevena.service;
 
-import com.nevena.entities.Film;
+import com.nevena.dto.user.LoginResponseDto;
+import com.nevena.dto.user.LoginRequestDto;
+import com.nevena.dto.user.RegisterRequestDto;
 import com.nevena.entities.User;
 
-import java.util.List;
-
 public interface UserService {
-
-    List<User> getAllUsers();
-    User getUserById(Long id);
-    User saveUser(User user);
-    void deleteUser(Long id);
-    User getUserByEmail(String email);
+    LoginResponseDto login(String email, String password);
+    String register(RegisterRequestDto dto);
+    User getByEmail(String email);
 }

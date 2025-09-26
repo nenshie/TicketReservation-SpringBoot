@@ -1,14 +1,12 @@
 package com.nevena.service;
 
-import com.nevena.dto.SeatDto;
-
-import java.util.List;
+import com.nevena.dto.seat.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SeatService {
 
-    List<SeatDto> getAllSeats();
-    SeatDto getSeatById(Long id);
-    SeatDto createSeat(SeatDto seatDto);
-    SeatDto updateSeat(Long id, SeatDto seatDto);
-    void deleteSeat(Long id);
+    SeatResponseDto get(Long id);
+    void delete(Long id);
+    Page<SeatResponseDto> list(Pageable pageable);
 }

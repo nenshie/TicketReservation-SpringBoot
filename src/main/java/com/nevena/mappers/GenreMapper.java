@@ -1,18 +1,11 @@
 package com.nevena.mappers;
 
-
-import com.nevena.dto.GenreDto;
+import com.nevena.dto.genre.GenreResponseDto;
 import com.nevena.entities.Genre;
+import com.nevena.mappers.config.CentralMapperConfig;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = CentralMapperConfig.class)
 public interface GenreMapper {
-
-    GenreMapper INSTANCE = Mappers.getMapper(GenreMapper.class);
-
-    GenreDto toDto(Genre genre);
-
-    Genre toEntity(GenreDto genreDto);
-
+    GenreResponseDto toDto(Genre genre);
 }

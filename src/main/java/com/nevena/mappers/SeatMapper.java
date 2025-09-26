@@ -1,20 +1,14 @@
 package com.nevena.mappers;
 
-import com.nevena.dto.SeatDto;
+import com.nevena.dto.seat.SeatResponseDto;
 import com.nevena.entities.Seat;
+import com.nevena.mappers.config.CentralMapperConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring", uses = {RoomMapper.class})
+@Mapper(config = CentralMapperConfig.class)
 public interface SeatMapper {
-
-    SeatMapper INSTANCE = Mappers.getMapper(SeatMapper.class);
-
-
-    @Mapping(source = "room", target = "room")
-    SeatDto toDto(Seat seat);
-
-    @Mapping(source = "room", target = "room")
-    Seat toEntity(SeatDto seatDto);
+    @Mapping(target = "roomId", source = "room.roomId")
+    @Mapping(target = "roomName", source = "room.name")
+    SeatResponseDto toDto(Seat entity);
 }

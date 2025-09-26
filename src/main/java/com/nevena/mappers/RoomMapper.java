@@ -1,15 +1,11 @@
 package com.nevena.mappers;
 
+import com.nevena.dto.room.RoomResponseDto;
 import com.nevena.entities.Room;
-import com.nevena.dto.RoomDto;
+import com.nevena.mappers.config.CentralMapperConfig;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(config = CentralMapperConfig.class)
 public interface RoomMapper {
-    RoomMapper INSTANCE = Mappers.getMapper(RoomMapper.class);
-
-    RoomDto toDto(Room room);
-
-    Room toEntity(RoomDto roomDto);
+    RoomResponseDto toDto(Room room);
 }

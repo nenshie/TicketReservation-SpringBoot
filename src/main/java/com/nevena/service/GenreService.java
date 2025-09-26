@@ -1,14 +1,10 @@
 package com.nevena.service;
 
-import com.nevena.dto.GenreDto;
-
-import java.util.List;
+import com.nevena.dto.genre.GenreResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface GenreService {
-
-    List<GenreDto> getAllGenres();
-    GenreDto getGenreById(Long id);
-    GenreDto createGenre(GenreDto genreDto);
-    GenreDto updateGenre(Long id, GenreDto genreDto);
-    void deleteGenre(Long id);
+    GenreResponseDto get(Long id);
+    Page<GenreResponseDto> list(Pageable pageable);
 }

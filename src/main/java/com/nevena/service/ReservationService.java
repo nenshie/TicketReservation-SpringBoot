@@ -1,13 +1,12 @@
 package com.nevena.service;
 
-import com.nevena.entities.Reservation;
-
-import java.util.List;
+import com.nevena.dto.reservation.ReservationCreateDto;
+import com.nevena.dto.reservation.ReservationResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ReservationService {
-
-    List<Reservation> getAllReservations();
-    Reservation getReservationById(Long id);
-    Reservation saveReservation(Reservation reservation);
-    void deleteReservation(Long id);
+    ReservationResponseDto create(Long userId, ReservationCreateDto dto);
+    ReservationResponseDto get(Long id);
+    Page<ReservationResponseDto> list(Pageable pageable);
 }

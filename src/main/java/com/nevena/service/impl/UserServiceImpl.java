@@ -1,46 +1,83 @@
 package com.nevena.service.impl;
 
-import com.nevena.entities.Ticket;
+import com.nevena.dto.user.LoginResponseDto;
+import com.nevena.dto.user.LoginRequestDto;
+import com.nevena.dto.user.RegisterRequestDto;
+import com.nevena.entities.Role;
 import com.nevena.entities.User;
-import com.nevena.repository.TicketRepository;
 import com.nevena.repository.UserRepository;
-import com.nevena.service.TicketService;
+import com.nevena.service.JwtService;
 import com.nevena.service.UserService;
+import com.nevena.service.exception.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    // ----------------------
+    // Login
+    // ----------------------
+    @Override
+    public LoginResponseDto login(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+
+        String token = jwtService.createJwt(user, roles);
+        return new LoginResponseDto(token);
     }
 
+    // ----------------------
+    // Register
+    // ----------------------
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public String register(RegisterRequestDto dto) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()){
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setName(dto.getName());
+        user.setSurname(dto.getSurname());
+        user.setJmbg(dto.getJmbg());
+
+        // Assign default role
+        Role role = new Role();
+        role.setName(dto.getRoles() != null && dto.getRoles().length > 0 ? dto.getRoles()[0] : "CLIENT");
+        user.getRoles().add(role);
+
+        userRepository.save(user);
+
+        return "User registered successfully!";
     }
 
+    // ----------------------
+    // Get user by email
+    // ----------------------
     @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
-
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
     }
 }

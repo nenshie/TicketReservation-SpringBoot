@@ -1,5 +1,6 @@
 package com.nevena.entities;
 
+import com.nevena.entities.common.Auditable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "Seat")
+@Table(
+        name = "Seat",
+        uniqueConstraints = @UniqueConstraint(name = "uk_room_row_seat", columnNames = {"roomId", "rowNumber", "seatNumber"})
+)
 public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,5 +27,4 @@ public class Seat {
     @ManyToOne
     @JoinColumn(name = "roomId", nullable = false)
     private Room room;
-
 }

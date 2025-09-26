@@ -1,56 +1,62 @@
 package com.nevena.controller;
 
-import com.nevena.dto.FilmDto;
+import com.nevena.dto.film.FilmCreateDto;
+import com.nevena.dto.film.FilmResponseDto;
+import com.nevena.dto.film.FilmUpdateDto;
 import com.nevena.service.FilmService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
 
     private final FilmService filmService;
 
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
-
     @GetMapping
-    public ResponseEntity<List<FilmDto>> getAllFilms() {
-        List<FilmDto> films = filmService.getAllFilms();
+    public ResponseEntity<Page<FilmResponseDto>> getAllFilms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "true") boolean ascending,
+            @RequestParam(required = false) String filterBy,
+            @RequestParam(required = false) String filterValue
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                ascending ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortBy
+        );
+
+        Page<FilmResponseDto> films = filmService.list(pageable, filterBy, filterValue);
         return ResponseEntity.ok(films);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FilmDto> getFilmById(@PathVariable Long id) {
-        FilmDto filmDTO = filmService.getFilmById(id);
-        if (filmDTO == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(filmDTO);
+    public ResponseEntity<FilmResponseDto> getFilmById(@PathVariable Long id) {
+        return ResponseEntity.ok(filmService.get(id));
     }
 
     @PostMapping
-    public ResponseEntity<FilmDto> createFilm(@RequestBody FilmDto FilmDto) {
-        FilmDto created = filmService.createFilm(FilmDto);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<FilmResponseDto> createFilm(@RequestBody FilmCreateDto dto) {
+        return ResponseEntity.ok(filmService.create(dto));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<FilmDto> updateFilm(@PathVariable Long id, @RequestBody FilmDto FilmDto) {
-        FilmDto updated = filmService.updateFilm(id, FilmDto);
-        if (updated == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(updated);
+    @PutMapping
+    public ResponseEntity<FilmResponseDto> updateFilm(@RequestBody FilmUpdateDto dto) {
+        return ResponseEntity.ok(filmService.update(dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
-        filmService.deleteFilm(id);
+        filmService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

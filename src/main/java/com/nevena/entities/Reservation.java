@@ -1,5 +1,6 @@
 package com.nevena.entities;
 
+import com.nevena.entities.common.Auditable;
 import com.nevena.entities.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,30 +12,33 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "Reservation")
-public class Reservation {
-
+public class Reservation extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
 
     @Enumerated(EnumType.STRING)
-    private ReservationStatus status;
+    @Column(nullable = false)
+    private ReservationStatus status = ReservationStatus.RESERVED;
 
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "ticketId")
+    // Single-seat reservation model (adjust to OneToMany<List<Ticket>> if needed)
+    @OneToOne
+    @JoinColumn(name = "ticketId", unique = true)
     private Ticket ticket;
 
-    private boolean paid;
+    @Column(nullable = false)
+    private boolean paid = false;
+
     private LocalDateTime paidAt;
     private String paymentProvider;
     private String paymentTransactionId;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime canceledAt;
 
-    private LocalDateTime updatedAt;
+    @Version
+    private Long version;
 }

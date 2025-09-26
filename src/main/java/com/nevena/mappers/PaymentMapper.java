@@ -1,16 +1,34 @@
 package com.nevena.mappers;
 
+import com.nevena.dto.payment.PaymentCreateDto;
+import com.nevena.dto.payment.PaymentResponseDto;
 import com.nevena.entities.Payment;
-import com.nevena.dto.PaymentDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import com.nevena.mappers.config.CentralMapperConfig;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = CentralMapperConfig.class, uses = {IdResolvers.class})
 public interface PaymentMapper {
 
-    @Mapping(source = "reservation.reservationId", target = "reservationId")
-    PaymentDto toDTO(Payment payment);
+    default com.nevena.entities.Reservation map(java.lang.Long id) {
+        if (id == null) return null;
+        com.nevena.entities.Reservation r = new com.nevena.entities.Reservation();
+        r.setReservationId(id);
+        return r;
+    }
 
-    @Mapping(source = "reservationId", target = "reservation.reservationId")
-    Payment toEntity(PaymentDto dto);
+    // reservationId -> reservation stub
+    @Mapping(target = "paymentId", ignore = true)
+    @Mapping(target = "reservation", source = "reservationId")
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "currency", ignore = true)
+    @Mapping(target = "transactionId", ignore = true)
+    @Mapping(target = "providerRef", ignore = true)
+    @Mapping(target = "errorCode", ignore = true)
+    @Mapping(target = "errorMessage", ignore = true)
+    @Mapping(target = "paidAt", ignore = true)
+    Payment toEntity(PaymentCreateDto dto);
+
+    // Flatten reservation
+    @Mapping(target = "reservationId", source = "reservation.reservationId")
+    PaymentResponseDto toDto(Payment entity);
 }

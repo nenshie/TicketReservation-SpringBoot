@@ -1,14 +1,10 @@
 package com.nevena.service;
 
-import com.nevena.dto.RoomDto;
-
-import java.util.List;
+import com.nevena.dto.room.RoomResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface RoomService {
-
-    List<RoomDto> getAllRooms();
-    RoomDto getRoomById(Long id);
-    RoomDto createRoom(RoomDto roomDto);
-    RoomDto updateRoom(Long id, RoomDto roomDto);
-    void deleteRoom(Long id);
+    RoomResponseDto get(Long id);
+    Page<RoomResponseDto> list(Pageable pageable);
 }

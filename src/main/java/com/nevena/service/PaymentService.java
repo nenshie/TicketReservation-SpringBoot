@@ -1,13 +1,10 @@
 package com.nevena.service;
 
-import com.nevena.entities.Payment;
-
-import java.util.List;
+import com.nevena.dto.payment.PaymentCreateDto;
+import com.nevena.dto.payment.PaymentResponseDto;
 
 public interface PaymentService {
-
-    List<Payment> getAllPayments();
-    Payment getPaymentById(Long id);
-    Payment savePayment(Payment payment);
-    void deletePayment(Long id);
+    PaymentResponseDto initiate(PaymentCreateDto dto);
+    PaymentResponseDto simulateSuccess(Long paymentId, String transactionId);
+    PaymentResponseDto simulateFailure(Long paymentId, String errorCode, String errorMessage);
 }
