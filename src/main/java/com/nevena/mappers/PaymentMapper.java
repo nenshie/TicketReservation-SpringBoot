@@ -16,7 +16,7 @@ public interface PaymentMapper {
         return r;
     }
 
-    // reservationId -> reservation stub
+
     @Mapping(target = "paymentId", ignore = true)
     @Mapping(target = "reservation", source = "reservationId")
     @Mapping(target = "status", ignore = true)
@@ -28,7 +28,7 @@ public interface PaymentMapper {
     @Mapping(target = "paidAt", ignore = true)
     Payment toEntity(PaymentCreateDto dto);
 
-    // Flatten reservation
+
     @Mapping(target = "reservationId", source = "reservation.reservationId")
     PaymentResponseDto toDto(Payment entity);
 }

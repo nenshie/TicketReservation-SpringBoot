@@ -15,12 +15,12 @@ public interface FilmMapper {
         g.setGenreId(id);
         return g;
     }
-    // Create: genreId -> genre
+
     @Mapping(target = "filmId", ignore = true)
     @Mapping(target = "genre", source = "genreId")
     Film toEntity(FilmCreateDto dto);
 
-    // Partial update: only provided fields; genreId -> genre
+
     @BeanMapping(
             ignoreByDefault = true,
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE

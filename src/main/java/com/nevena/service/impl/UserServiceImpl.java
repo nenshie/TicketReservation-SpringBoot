@@ -1,13 +1,11 @@
 package com.nevena.service.impl;
 
 import com.nevena.dto.user.LoginResponseDto;
-import com.nevena.dto.user.LoginRequestDto;
 import com.nevena.dto.user.RegisterRequestDto;
 import com.nevena.entities.Role;
 import com.nevena.entities.User;
 import com.nevena.repository.RoleRepository;
 import com.nevena.repository.UserRepository;
-import com.nevena.service.JwtService;
 import com.nevena.service.UserService;
 import com.nevena.service.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;

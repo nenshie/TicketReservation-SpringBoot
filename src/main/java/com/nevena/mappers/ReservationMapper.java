@@ -18,7 +18,7 @@ public interface ReservationMapper {
     }
 
 
-    // ticketId -> ticket stub
+
     @Mapping(target = "reservationId", ignore = true)
     @Mapping(target = "tickets", ignore = true)
     @Mapping(target = "status", ignore = true)
@@ -29,7 +29,7 @@ public interface ReservationMapper {
     @Mapping(target = "paymentTransactionId", ignore = true)
     Reservation toEntity(MakeReservationDto dto);
 
-    // Flatten user/ticket IDs
+
     @Mapping(target = "userId", source = "user.userId")
     @Mapping(target = "tickets", source = "tickets")
     ReservationResponseDto toDto(Reservation entity);

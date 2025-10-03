@@ -27,7 +27,7 @@ public class Reservation extends Auditable {
     @JoinColumn(name = "userId")
     private User user;
 
-    // Single-seat reservation model (adjust to OneToMany<List<Ticket>> if needed)
+
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets = new ArrayList<>();
 

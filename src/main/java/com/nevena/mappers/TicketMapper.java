@@ -25,7 +25,7 @@ public interface TicketMapper {
     }
 
 
-    // Create: IDs -> reference entiteti
+
     @Mapping(target = "ticketId", ignore = true)
     @Mapping(target = "projection", source = "projectionId")
     @Mapping(target = "seat", source = "seatId")
@@ -36,7 +36,7 @@ public interface TicketMapper {
     @Mapping(target = "version", ignore = true)
     Ticket toEntity(TicketCreateDto dto);
 
-    // Response: obogaćeni podaci
+
     @Mapping(target = "projectionId", source = "projection.projectionId")
     @Mapping(target = "filmTitle", source = "projection.film.title")
     @Mapping(target = "roomId", source = "projection.room.roomId")

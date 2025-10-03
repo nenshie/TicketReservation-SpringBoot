@@ -1,4 +1,4 @@
-package com.nevena.service;
+package com.nevena.service.impl;
 
 import com.nevena.entities.User;
 import io.jsonwebtoken.Claims;
@@ -18,10 +18,10 @@ import java.util.Set;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    private String secret;       // 32+ bytes (raw) or Base64 of 32 bytes
+    private String secret;
 
     @Value("${jwt.expiration}")
-    private long expiration;     // e.g., 3900000 for 65 minutes
+    private long expiration;
 
     @Value("${jwt.issuer:ticket-reservation}")
     private String issuer;
@@ -56,7 +56,6 @@ public class JwtService {
         if (keyBytes == null) {
             keyBytes = configuredSecret.getBytes(StandardCharsets.UTF_8);
         }
-        // Enforces >= 256 bits for HS256
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
