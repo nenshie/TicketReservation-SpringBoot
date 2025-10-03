@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectionController {
     private final ProjectionService service;
 
-    @PostMapping
+    @PostMapping("/create-projection")
     public ProjectionResponseDto create(@RequestBody @jakarta.validation.Valid ProjectionCreateDto dto) {
         return service.create(dto);
     }

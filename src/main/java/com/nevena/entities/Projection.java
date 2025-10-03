@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,4 +38,7 @@ public class Projection extends Auditable {
 
     @OneToMany(mappedBy = "projection")
     private List<Ticket> tickets = new ArrayList<>();
+
+    @Column(nullable = true, precision = 10, scale = 2)
+    private BigDecimal price;
 }

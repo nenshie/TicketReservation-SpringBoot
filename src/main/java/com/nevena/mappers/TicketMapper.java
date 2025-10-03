@@ -44,5 +44,6 @@ public interface TicketMapper {
     @Mapping(target = "seatId", source = "seat.seatId")
     @Mapping(target = "seatRow", source = "seat.rowNumber")
     @Mapping(target = "seatNumber", source = "seat.seatNumber")
+    @Mapping(target = "qrCode", source = "qrCode")
     TicketResponseDto toDto(Ticket entity);
 }

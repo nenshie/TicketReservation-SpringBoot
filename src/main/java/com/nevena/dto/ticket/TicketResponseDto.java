@@ -15,6 +15,7 @@ public class TicketResponseDto {
     private Long seatId;
     private Integer seatRow;
     private Integer seatNumber;
+    private String qrCode;
     private java.time.LocalDateTime verifiedAt;
     private Long verifiedByUserId;
     private java.time.LocalDateTime createdAt;

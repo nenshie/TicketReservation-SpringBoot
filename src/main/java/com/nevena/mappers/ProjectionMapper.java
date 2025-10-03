@@ -50,8 +50,11 @@ public interface ProjectionMapper {
     @Mapping(target = "genreName", source = "film.genre.name")
     @Mapping(target = "roomId", source = "room.roomId")
     @Mapping(target = "roomName", source = "room.name")
+    @Mapping(target = "numberOfRows", source = "room.numberOfRows")
+    @Mapping(target = "seatsPerRow", source = "room.seatsPerRow")
     @Mapping(target = "active", source = "active")
     @Mapping(target = "salesOpenUntil", source = "salesOpenUntil")
+    @Mapping(target = "price", source = "price")
     ProjectionResponseDto toDto(Projection entity);
 }
 

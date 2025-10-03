@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -34,7 +35,11 @@ public class Ticket extends Auditable {
     @Column(nullable = false, unique = true, length = 64)
     private String publicCode = UUID.randomUUID().toString();
 
-    private String qrCode; // optional raw image data/url if stored
+    @Column(name = "qr_code", columnDefinition = "VARCHAR(MAX)")
+    private String qrCode;
+
+    @Column(name = "price")
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,4 +58,8 @@ public class Ticket extends Auditable {
 
     @Version
     private Long version;
+
+    @ManyToOne
+    @JoinColumn(name = "reservationId")
+    private Reservation reservation;
 }

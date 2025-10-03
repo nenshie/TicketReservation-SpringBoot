@@ -10,5 +10,5 @@ public class RegisterRequestDto {
     private String surname;
     private String jmbg;
     private String mobileNumber;
-    private String[] roles;
+    private String roles;
 }

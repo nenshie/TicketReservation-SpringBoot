@@ -1,16 +1,13 @@
 package com.nevena.service.impl;
 
 import com.nevena.dto.payment.PaymentCreateDto;
+import com.nevena.dto.payment.PaymentRequestDto;
 import com.nevena.dto.payment.PaymentResponseDto;
-import com.nevena.entities.Payment;
-import com.nevena.entities.Reservation;
-import com.nevena.entities.Ticket;
+import com.nevena.entities.*;
 import com.nevena.entities.enums.PaymentStatus;
 import com.nevena.entities.enums.ReservationStatus;
 import com.nevena.mappers.PaymentMapper;
-import com.nevena.repository.PaymentRepository;
-import com.nevena.repository.ReservationRepository;
-import com.nevena.repository.TicketRepository;
+import com.nevena.repository.*;
 import com.nevena.service.PaymentService;
 import com.nevena.service.exception.BusinessException;
 import com.nevena.service.exception.NotFoundException;
@@ -18,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,6 +27,60 @@ public class PaymentServiceImpl implements PaymentService {
     private final ReservationRepository reservationRepo;
     private final TicketRepository ticketRepo;
     private final PaymentMapper mapper;
+
+    private final CardRepository cardRepository;
+    private final ReservationRepository reservationRepository;
+    private final CinemaAccountRepository cinemaAccountRepository;
+
+    @Override
+    @Transactional
+    public void payForReservation(Long reservationId, PaymentRequestDto dto) {
+        // 1. find the card
+        Card card = cardRepository.findByCardNumberAndExpiryDateAndCvv(
+                dto.getCardNumber(),
+                dto.getExpiryDate(),
+                dto.getCvv()
+        ).orElseThrow(() -> new RuntimeException("Invalid card"));
+
+        // 2. find the reservation
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+
+    // 3. calculate the sum
+        BigDecimal totalPrice = reservation.getTickets().stream()
+                .map(t -> t.getPrice() != null ? t.getPrice() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // 4. check the balance of the card
+        BigDecimal cardBalanceBD = card.getBalance() != null
+                ? BigDecimal.valueOf(card.getBalance())
+                : BigDecimal.ZERO;
+
+        if (cardBalanceBD.compareTo(totalPrice) < 0) {
+            throw new RuntimeException("Insufficient balance");
+        }
+
+    // 5. remove the amount of the price from the card
+        card.setBalance((double) cardBalanceBD.subtract(totalPrice).floatValue());
+        cardRepository.save(card);
+
+    // 6. add money to the cinema card
+        CinemaAccount cinemaAccount = cinemaAccountRepository.findFirstByOrderByIdAsc()
+                .orElseThrow(() -> new RuntimeException("Cinema account not found"));
+
+        BigDecimal cinemaBalanceBD = cinemaAccount.getBalance() != null
+                ? cinemaAccount.getBalance()
+                : BigDecimal.ZERO;
+
+        cinemaAccount.setBalance(cinemaBalanceBD.add(totalPrice));
+        cinemaAccountRepository.save(cinemaAccount);
+
+        // 7. update reservation and ticket status
+        reservation.setStatus(ReservationStatus.PAID);
+        reservation.getTickets().forEach(t -> t.setStatus(ReservationStatus.PAID));
+        reservationRepository.save(reservation);
+    }
+
 
     @Override
     @Transactional
@@ -69,11 +122,11 @@ public class PaymentServiceImpl implements PaymentService {
         reservation.setStatus(ReservationStatus.PAID);
         reservationRepo.save(reservation);
 
-        Ticket ticket = reservation.getTicket();
-        if (ticket != null) {
-            ticket.setStatus(com.nevena.entities.enums.ReservationStatus.PAID);
-            ticketRepo.save(ticket);
-        }
+//        List<Ticket> ticket = reservation.getTickets();
+//        if (ticket != null) {
+//            ticket.setStatus(com.nevena.entities.enums.ReservationStatus.PAID);
+//            ticketRepo.save(ticket);
+//        }
 
         return mapper.toDto(paymentRepo.save(payment));
     }

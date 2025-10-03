@@ -5,6 +5,7 @@ import com.nevena.dto.user.LoginRequestDto;
 import com.nevena.dto.user.RegisterRequestDto;
 import com.nevena.entities.Role;
 import com.nevena.entities.User;
+import com.nevena.repository.RoleRepository;
 import com.nevena.repository.UserRepository;
 import com.nevena.service.JwtService;
 import com.nevena.service.UserService;
@@ -23,12 +24,16 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    // ----------------------
-    // Login
-    // ----------------------
+    /***
+     * Login user
+     * @param email
+     * @param password
+     * @return
+     */
     @Override
     public LoginResponseDto login(String email, String password) {
         User user = userRepository.findByEmail(email)
@@ -46,9 +51,11 @@ public class UserServiceImpl implements UserService {
         return new LoginResponseDto(token);
     }
 
-    // ----------------------
-    // Register
-    // ----------------------
+    /***
+     * Register new user
+     * @param dto
+     * @return
+     */
     @Override
     public String register(RegisterRequestDto dto) {
         if (userRepository.findByEmail(dto.getEmail()).isPresent()){
@@ -62,22 +69,15 @@ public class UserServiceImpl implements UserService {
         user.setSurname(dto.getSurname());
         user.setJmbg(dto.getJmbg());
 
-        // Assign default role
-        Role role = new Role();
-        role.setName(dto.getRoles() != null && dto.getRoles().length > 0 ? dto.getRoles()[0] : "CLIENT");
-        user.getRoles().add(role);
+        Role clientRole = roleRepository.findByName("CLIENT")
+                .orElseThrow(() -> new RuntimeException("Default role CLIENT not found"));
+
+        user.getRoles().add(clientRole);
 
         userRepository.save(user);
 
         return "User registered successfully!";
     }
 
-    // ----------------------
-    // Get user by email
-    // ----------------------
-    @Override
-    public User getByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
-    }
+
 }

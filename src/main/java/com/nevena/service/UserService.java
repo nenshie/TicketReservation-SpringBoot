@@ -8,5 +8,4 @@ import com.nevena.entities.User;
 public interface UserService {
     LoginResponseDto login(String email, String password);
     String register(RegisterRequestDto dto);
-    User getByEmail(String email);
 }

@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class ProjectionServiceImpl implements ProjectionService {
@@ -25,6 +27,8 @@ public class ProjectionServiceImpl implements ProjectionService {
     @Transactional
     public ProjectionResponseDto create(ProjectionCreateDto dto) {
         Projection entity = mapper.toEntity(dto);
+        entity.setPrice(BigDecimal.valueOf(550));
+        entity.setSalesOpenUntil(dto.getDateTime());
         return mapper.toDto(repo.save(entity));
     }
 

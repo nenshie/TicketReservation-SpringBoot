@@ -1,4 +1,4 @@
-package com.nevena.service.config;
+package com.nevena.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +19,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(withDefaults())                                   // use your WebMvcConfigurer CORS[1][2]
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**")) // allow POST /auth/** without CSRF token[3][4]
+                .cors(withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/films/**").permitAll()
                         .requestMatchers("/projections/**").permitAll()
+                        .requestMatchers("/seats/**").permitAll()
+                        .requestMatchers("/reservations/**").permitAll()
+                        .requestMatchers("/rooms/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());

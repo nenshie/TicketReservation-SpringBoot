@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
     private final RoomRepository repo;
@@ -23,7 +25,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Page<RoomResponseDto> list(Pageable pageable) {
-        return repo.findAll(pageable).map(mapper::toDto);
+    public List<RoomResponseDto> list() {
+
+        List<Room> rooms = repo.findAll();
+        return rooms.stream()
+                .map(mapper::toDto)
+                .toList();
     }
 }

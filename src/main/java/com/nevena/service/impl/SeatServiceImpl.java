@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service @RequiredArgsConstructor
 public class SeatServiceImpl implements SeatService {
     private final SeatRepository repo;
@@ -21,6 +23,23 @@ public class SeatServiceImpl implements SeatService {
         return repo.findById(id).map(mapper::toDto)
                 .orElseThrow(() -> new NotFoundException("Seat not found"));
     }
-    @Override public void delete(Long id) { repo.deleteById(id); }
     @Override public Page<SeatResponseDto> list(Pageable p) { return repo.findAll(p).map(mapper::toDto); }
+
+    @Override
+    public OccupiedSeatDto getSeatById(Long id) {
+        return null;
+    }
+
+    @Override
+    public List<OccupiedSeatDto> getSeatsWithAvailability(Long projectionId) {
+        return repo.getSeatsWithAvailability(projectionId)
+                .stream()
+                .map(v -> OccupiedSeatDto.builder()
+                        .seatId(v.getSeatId())
+                        .rowNumber(v.getRowNumber())
+                        .seatNumber(v.getSeatNumber())
+                        .occupied(v.getIsTaken())
+                        .build())
+                .toList();
+    }
 }

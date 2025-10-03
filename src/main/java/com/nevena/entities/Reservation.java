@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,9 +28,8 @@ public class Reservation extends Auditable {
     private User user;
 
     // Single-seat reservation model (adjust to OneToMany<List<Ticket>> if needed)
-    @OneToOne
-    @JoinColumn(name = "ticketId", unique = true)
-    private Ticket ticket;
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean paid = false;
